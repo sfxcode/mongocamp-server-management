@@ -1,0 +1,65 @@
+import { fileURLToPath } from 'node:url'
+
+// Server proxy mode has no login, so there is nothing for the route guards to unlock
+const useServerProxy = process.env.MONGOCAMP_USE_SERVER_PROXY === 'true'
+
+export default defineNuxtConfig({
+  modules: [
+    '@sfxcode/nuxt-ui-mongocamp',
+  ],
+  ssr: false,
+  devtools: { enabled: true },
+  css: ['~/assets/css/main.css'],
+  compatibilityDate: 'latest',
+  nitro: {
+    // The demo data (/data/*.json) is served from the playground, not copied
+    publicAssets: [
+      { dir: fileURLToPath(new URL('../../playground/public', import.meta.url)) },
+    ],
+  },
+  vite: {
+    optimizeDeps: {
+      include: [
+        '@formkit/addons',
+        '@formkit/core',
+        '@formkit/i18n',
+        '@nuxt/devtools > @vitejs/devtools-kit/client',
+        '@nuxt/devtools > @vue/devtools-core',
+        '@nuxt/devtools > @vue/devtools-kit',
+        '@nuxt/devtools > error-stack-parser-es',
+        '@nuxt/devtools > vite-plugin-vue-tracer/client/overlay',
+        'tailwindcss/colors',
+      ],
+    },
+  },
+  fonts: {
+    // The families are declared as --font-sans / --font-mono in main.css
+    processCSSVariables: true,
+  },
+  // No /de prefix: the /secured/** route guards below match on the plain path
+  i18n: {
+    strategy: 'no_prefix',
+    // The console's own strings (namespace serverManagement); the module registers its own
+    locales: [
+      { code: 'en', name: 'English', file: 'en.json' },
+      { code: 'de', name: 'Deutsch', file: 'de.json' },
+    ],
+  },
+  mongocamp: {
+    url: process.env.MONGOCAMP_URL,
+    // Server proxy mode only; stays on the server
+    apiKey: process.env.MONGOCAMP_API_KEY,
+    paginationSize: 1000,
+    tokenRefreshInterval: 60 * 1000,
+    refreshToken: true,
+  },
+  nuxtUiMongocamp: {
+    useGlobalAuthMiddleware: !useServerProxy,
+    notAllowedPath: '/',
+    managerRoles: ['manager'],
+    securedRouteParts: ['/secured/**'],
+    managementRouteParts: ['/secured/manager/**'],
+    adminRouteParts: ['/secured/admin/**'],
+    useServerProxy,
+  },
+})

@@ -1,0 +1,121 @@
+/*
+ * Design tokens — the only place colours and font names are written down.
+ * lake = primary (actions), ember = secondary (the one accent), stone = neutral.
+ * app.config.ts maps them onto Nuxt UI's semantic colours.
+ */
+:root {
+  --font-sans: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --color-lake-50: oklch(97% 0.015 205);
+  --color-lake-100: oklch(94% 0.03 205);
+  --color-lake-200: oklch(89% 0.05 206);
+  --color-lake-300: oklch(81% 0.075 207);
+  --color-lake-400: oklch(72% 0.09 208);
+  --color-lake-500: oklch(60% 0.095 209);
+  --color-lake-600: oklch(48% 0.085 210);
+  --color-lake-700: oklch(41% 0.07 211);
+  --color-lake-800: oklch(35% 0.058 212);
+  --color-lake-900: oklch(30% 0.048 213);
+  --color-lake-950: oklch(22% 0.035 214);
+
+  --color-ember-50: oklch(97% 0.015 50);
+  --color-ember-100: oklch(94% 0.035 49);
+  --color-ember-200: oklch(88% 0.065 48);
+  --color-ember-300: oklch(80% 0.1 47);
+  --color-ember-400: oklch(71% 0.125 46);
+  --color-ember-500: oklch(62% 0.145 44);
+  --color-ember-600: oklch(54% 0.14 42);
+  --color-ember-700: oklch(46% 0.12 41);
+  --color-ember-800: oklch(39% 0.1 40);
+  --color-ember-900: oklch(33% 0.08 40);
+  --color-ember-950: oklch(23% 0.055 40);
+
+  --color-stone-50: oklch(98% 0.003 170);
+  --color-stone-100: oklch(96% 0.004 170);
+  --color-stone-200: oklch(92% 0.006 170);
+  --color-stone-300: oklch(86.5% 0.008 170);
+  --color-stone-400: oklch(70.5% 0.012 172);
+  --color-stone-500: oklch(55% 0.014 174);
+  --color-stone-600: oklch(44% 0.014 176);
+  --color-stone-700: oklch(36% 0.013 178);
+  --color-stone-800: oklch(30% 0.013 180);
+  --color-stone-900: oklch(25% 0.013 182);
+  --color-stone-950: oklch(21% 0.013 184);
+
+  --ui-radius: 0.25rem;
+}
+
+/* Light: the action colour is the deep lake, text is near-black stone */
+:root,
+.light {
+  --ui-primary: var(--ui-color-primary-600);
+  --ui-secondary: var(--ui-color-secondary-600);
+  --ui-bg: var(--ui-color-neutral-50);
+  --ui-bg-muted: var(--ui-color-neutral-100);
+  --ui-bg-elevated: var(--ui-color-neutral-200);
+  --ui-bg-accented: var(--ui-color-neutral-300);
+  --ui-border: var(--ui-color-neutral-200);
+  --ui-border-accented: var(--ui-color-neutral-300);
+
+  /* Chart series: fixed order, checked with the dataviz palette validator against this surface */
+  --ui-chart-1: #00789c;
+  --ui-chart-2: #ba4f1f;
+  --ui-chart-3: #683eb6;
+  --ui-chart-4: #aa8300;
+  --ui-chart-5: #a90959;
+  --ui-chart-6: #399d57;
+}
+
+/* Dark: spruce-slate, not black */
+.dark {
+  --ui-primary: var(--ui-color-primary-400);
+  --ui-secondary: var(--ui-color-secondary-400);
+  --ui-bg: var(--ui-color-neutral-950);
+  --ui-bg-muted: var(--ui-color-neutral-900);
+  --ui-bg-elevated: var(--ui-color-neutral-800);
+  --ui-bg-accented: var(--ui-color-neutral-700);
+  --ui-border: var(--ui-color-neutral-800);
+  --ui-border-accented: var(--ui-color-neutral-700);
+
+  --ui-chart-1: #0b9db3;
+  --ui-chart-2: #ce6330;
+  --ui-chart-3: #855dd7;
+  --ui-chart-4: #b28c00;
+  --ui-chart-5: #be296a;
+  --ui-chart-6: #47aa62;
+}
+
+html {
+  font-family: var(--font-sans);
+}
+
+/* Figures line up in stat cards. Not set on whole tables: this typeface also widens the punctuation
+   around tabular figures, which pulls apart e-mail addresses and dates. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Mono only where the content is code or data */
+pre,
+code,
+kbd,
+samp,
+.font-mono {
+  font-family: var(--font-mono);
+  font-size: 0.925em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ui-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "name": "nuxt-app",
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@sfxcode/nuxt-ui-mongocamp": "^1.5.3",
+    "nuxt": "^4.6.4"
+  }
+}
