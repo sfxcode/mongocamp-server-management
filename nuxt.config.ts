@@ -63,7 +63,6 @@ export default defineNuxtConfig({
     notAllowedPath: '/',
     managerRoles: ['manager'],
     securedRouteParts: ['/secured/**'],
-    managementRouteParts: ['/secured/manager/**'],
     adminRouteParts: ['/secured/admin/**'],
     useServerProxy,
   },

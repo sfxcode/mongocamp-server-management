@@ -1,28 +1,37 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const state = useMongocampStorage()
-const { isAdmin, isManager } = useConsoleRoles()
-const isProxyMode = useProxyMode()
+const { canSeeAdmin: isAdmin, canSeeManagement: isManager } = useMongocampRoles()
+const isProxyMode = useMongocampProxyMode()
+const managerRoles: string[] = useRuntimeConfig().public.nuxtUiMongocampOptions?.managerRoles ?? []
 
 const profile = computed(() => state.value?.profile)
 const roles = computed(() => profile.value?.roles ?? [])
+
+// Managers see what they can reach, and which of their roles makes them a manager
+const managerHint = computed(() => {
+  if (!isManager.value || isAdmin.value) return undefined
+  const held = roles.value.filter(role => managerRoles.includes(role))
+  return t('serverManagement.home.managerHint', { roles: held.join(', ') }, held.length)
+})
 const title = computed(() => profile.value?.user
   ? t('serverManagement.home.welcome', { name: profile.value.user })
   : t('serverManagement.nav.home'))
 
+// A role is not a problem: red and amber stay reserved for errors and warnings
 const roleBadge = computed(() => {
-  if (isAdmin.value || isProxyMode) return { label: t('serverManagement.user.administrator'), color: 'error' as const }
-  if (isManager.value) return { label: t('serverManagement.user.manager'), color: 'warning' as const }
+  if (isAdmin.value || isProxyMode) return { label: t('serverManagement.user.administrator'), color: 'primary' as const }
+  if (isManager.value) return { label: t('serverManagement.user.manager'), color: 'secondary' as const }
   return { label: t('serverManagement.user.standard'), color: 'neutral' as const }
 })
 
 const dashboard = useTemplateRef<{ refresh: () => unknown }>('dashboard')
-const collectionNames = useState<string[] | null>('collection-panel-names', () => null)
+const { refresh: refreshCollectionNames } = useMongocampCollectionNames()
 
 function onTestDataChanged() {
   dashboard.value?.refresh()
-  // The collection panel reloads its list the next time it is shown
-  collectionNames.value = null
+  // The demo data adds and drops collections: the shared list behind the collection panel is asked again
+  refreshCollectionNames()
 }
 </script>
 
@@ -30,7 +39,7 @@ function onTestDataChanged() {
   <AppPage
     :title="title"
     heading
-    :description="isManager && !isAdmin ? t('serverManagement.home.managerHint') : undefined"
+    :description="managerHint"
     :width="isAdmin ? 'full' : 'default'"
   >
     <template #actions>
@@ -38,10 +47,7 @@ function onTestDataChanged() {
         v-if="isAdmin"
         :target="dashboard"
       />
-      <UBadge
-        :color="roleBadge.color"
-        variant="subtle"
-      >
+      <UBadge :color="roleBadge.color">
         {{ roleBadge.label }}
       </UBadge>
       <UBadge
@@ -49,7 +55,6 @@ function onTestDataChanged() {
         :key="role"
         color="neutral"
         variant="outline"
-        class="hidden sm:inline-flex"
       >
         {{ role }}
       </UBadge>
@@ -61,25 +66,15 @@ function onTestDataChanged() {
       ref="dashboard"
       hide-heading
       hide-refresh
-      class="!gap-6"
     >
-      <DestinationList />
-      <TestDataPanel @changed="onTestDataChanged" />
+      <!-- The module spaces its own sections; the console's two share the page's rhythm -->
+      <div class="flex flex-col gap-6">
+        <DestinationList />
+        <TestDataPanel @changed="onTestDataChanged" />
+      </div>
     </MongocampDashboard>
 
     <!-- Manager and standard user: what they can reach -->
-    <template v-else>
-      <div v-if="isManager">
-        <UButton
-          to="/secured/manager"
-          icon="i-lucide-briefcase"
-          color="neutral"
-          variant="outline"
-        >
-          {{ t('serverManagement.home.managerOpen') }}
-        </UButton>
-      </div>
-      <UserAccess />
-    </template>
+    <MongocampUserAccess v-else />
   </AppPage>
 </template>

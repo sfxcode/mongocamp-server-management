@@ -10,8 +10,6 @@
     "nav": {
       "home": "Start",
       "account": "Konto",
-      "manager": "Manager",
-      "managerArea": "Managerbereich",
       "users": "Benutzer",
       "roles": "Rollen",
       "permissions": "Berechtigungen",
@@ -51,8 +49,7 @@
     "home": {
       "welcome": "Willkommen, {name}",
       "destinations": "Gehe zu",
-      "managerHint": "Sie verwalten Daten dieses Servers.",
-      "managerOpen": "Managerbereich öffnen",
+      "managerHint": "Sie verwalten Daten dieses Servers | Sie verwalten Daten dieses Servers über die Rolle {roles}. | Sie verwalten Daten dieses Servers über die Rollen {roles}.",
       "usersText": "Konten, ihre Rollen und API-Keys",
       "rolesText": "Rollen und ihre Collection-Rechte",
       "permissionsText": "Wer was lesen, schreiben und verwalten darf",
@@ -62,15 +59,6 @@
       "databasesText": "Datenbanken dieses Servers und ihre Größe",
       "serverText": "MongoDB-Version, Last und Fähigkeiten",
       "settingsText": "Plugins, Cluster und Konfiguration"
-    },
-    "manager": {
-      "title": "Managerbereich",
-      "why": "Warum Sie Manager sind",
-      "adminReason": "Administratoren zählen immer als Manager.",
-      "roleReason": "Sie haben die Rolle {role}.",
-      "adminHintTitle": "Sie sehen alles",
-      "adminHint": "Als Administrator haben Sie die vollständige Serverübersicht.",
-      "openOverview": "Übersicht öffnen"
     },
     "testData": {
       "title": "Demodaten",
