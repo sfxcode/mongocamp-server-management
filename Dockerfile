@@ -16,7 +16,9 @@
 
 ARG NODE_VERSION=24
 
-FROM node:${NODE_VERSION}-alpine AS build
+# The build runs on the builder's own platform: .output is plain JavaScript (no native modules), so a
+# multi-arch build does not have to run the Nuxt build under emulation.
+FROM --platform=$BUILDPLATFORM node:${NODE_VERSION}-alpine AS build
 RUN npm install --global pnpm@12.15.0
 WORKDIR /app
 
