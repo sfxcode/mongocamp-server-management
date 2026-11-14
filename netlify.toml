@@ -1,0 +1,33 @@
+# The console as a static single-page app (login mode). API key mode needs the Nitro server and its
+# /api/_mongocamp proxy, so it is not available here: use the Docker image for it.
+#
+# Set MONGOCAMP_URL in the site's environment variables: with a static build it is read while building,
+# and the MongoCamp server has to allow the site's origin (CORS).
+
+[build]
+  command = "pnpm generate"
+  publish = ".output/public"
+
+[build.environment]
+  NODE_VERSION = "24"
+  # Plain static files, whatever Netlify would otherwise detect
+  NITRO_PRESET = "static"
+  MONGOCAMP_USE_SERVER_PROXY = "false"
+
+# Client-side routing: every path not backed by a file opens the app
+[[redirects]]
+  from = "/*"
+  to = "/200.html"
+  status = 200
+
+[[headers]]
+  for = "/_nuxt/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "DENY"
