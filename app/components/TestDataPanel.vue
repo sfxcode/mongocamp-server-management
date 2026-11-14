@@ -12,19 +12,32 @@ type PendingAction = 'reset' | 'drop' | null
 
 const { t } = useI18n()
 const toast = useToast()
-const { resetSteps, dropAll } = useTestData()
+const { resetSteps, dropAll, collectionNames, bucketName } = useTestData()
+// The shared list is loaded by the collection panel, which the dashboard does not have
+const { names, buckets, load } = useMongocampCollectionNames()
+onMounted(() => load())
 
 const pendingAction = ref<PendingAction>(null)
-const running = ref(false)
+// Which action runs, so only its own button spins and the other one waits disabled
+const runningAction = ref<PendingAction>(null)
+const running = computed(() => runningAction.value !== null)
+// The step list belongs to the action that ran last: a drop is a single step, a reset all of them
+const lastAction = ref<PendingAction>(null)
 const statuses = ref<Record<string, StepStatus>>({})
 const hasRun = computed(() => Object.keys(statuses.value).length > 0)
 
-const steps = computed(() => resetSteps.map(step => ({
-  key: step.key,
-  label: step.key === 'drop' ? t('serverManagement.testData.stepDrop') : step.label,
-  isName: step.key !== 'drop',
-  status: statuses.value[step.key] ?? 'pending',
-})))
+const steps = computed(() => resetSteps
+  .filter(step => lastAction.value !== 'drop' || step.key === 'drop')
+  .map(step => ({
+    key: step.key,
+    label: step.key === 'drop' ? t('serverManagement.testData.stepDrop') : step.label,
+    isName: step.key !== 'drop',
+    status: statuses.value[step.key] ?? 'pending',
+  })))
+
+// A reset replaces whatever demo data is there; the confirmation says so when there is some
+const existing = computed(() => collectionNames.filter(name => names.value.includes(name)).length
+  + (buckets.value.includes(bucketName) ? 1 : 0))
 
 const STATUS_ICON: Record<StepStatus, string> = {
   pending: 'i-lucide-circle-dashed',
@@ -71,12 +84,14 @@ async function runReset() {
 }
 
 async function runDrop() {
-  statuses.value = {}
+  statuses.value = { drop: 'running' }
   try {
     await dropAll()
+    statuses.value.drop = 'done'
     toast.add({ title: t('serverManagement.testData.dropDone'), color: 'success' })
   }
   catch {
+    statuses.value.drop = 'failed'
     toast.add({ title: t('serverManagement.testData.dropFailed'), color: 'error' })
   }
 }
@@ -85,13 +100,14 @@ async function confirm() {
   const action = pendingAction.value
   pendingAction.value = null
   if (!action || running.value) return
-  running.value = true
+  runningAction.value = action
+  lastAction.value = action
   try {
     if (action === 'reset') await runReset()
     else await runDrop()
   }
   finally {
-    running.value = false
+    runningAction.value = null
     emit('changed')
   }
 }
@@ -126,7 +142,8 @@ const isConfirmOpen = computed({
           icon="i-lucide-rotate-ccw"
           color="neutral"
           variant="outline"
-          :loading="running"
+          :loading="runningAction === 'reset'"
+          :disabled="runningAction === 'drop'"
           @click="askReset"
         >
           {{ t('serverManagement.testData.reset') }}
@@ -135,7 +152,8 @@ const isConfirmOpen = computed({
           icon="i-lucide-trash-2"
           color="error"
           variant="ghost"
-          :disabled="running"
+          :loading="runningAction === 'drop'"
+          :disabled="runningAction === 'reset'"
           @click="askDrop"
         >
           {{ t('serverManagement.testData.drop') }}
@@ -168,6 +186,17 @@ const isConfirmOpen = computed({
       :title="pendingAction === 'drop' ? t('serverManagement.testData.dropConfirmTitle') : t('serverManagement.testData.resetConfirmTitle')"
       :description="pendingAction === 'drop' ? t('serverManagement.testData.dropConfirmText') : t('serverManagement.testData.resetConfirmText')"
     >
+      <template
+        v-if="pendingAction === 'reset' && existing > 0"
+        #body
+      >
+        <UAlert
+          color="warning"
+          variant="subtle"
+          icon="i-lucide-triangle-alert"
+          :title="t('serverManagement.testData.resetExisting', { n: existing }, existing)"
+        />
+      </template>
       <template #footer>
         <div class="flex w-full justify-end gap-2">
           <UButton
@@ -175,10 +204,11 @@ const isConfirmOpen = computed({
             variant="ghost"
             @click="cancel"
           >
-            {{ t('serverManagement.testData.cancel') }}
+            {{ t('nuxtUiMongocamp.common.cancel') }}
           </UButton>
+          <!-- Both replace data on the server, so both confirm in the destructive colour -->
           <UButton
-            :color="pendingAction === 'drop' ? 'error' : 'primary'"
+            color="error"
             @click="confirm"
           >
             {{ pendingAction === 'drop' ? t('serverManagement.testData.drop') : t('serverManagement.testData.reset') }}

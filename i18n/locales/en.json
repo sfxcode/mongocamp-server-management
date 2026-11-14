@@ -46,9 +46,7 @@
     "login": {
       "headline": "Every collection, user and job of your MongoCamp server in one console.",
       "lead": "Browse and edit documents, manage users, roles and grants, watch the server.",
-      "proxyTitle": "This console uses an API key",
-      "proxyText": "No login is needed. Everything you do runs with the rights of the configured key.",
-      "proxyOpen": "Open the console"
+      "signedOut": "You are signed out."
     },
     "home": {
       "welcome": "Welcome, {name}",
@@ -83,7 +81,6 @@
       "resetConfirmText": "The six test_ collections and the test_images bucket are deleted and filled again.",
       "dropConfirmTitle": "Drop the demo data?",
       "dropConfirmText": "The six test_ collections and the test_images bucket are deleted. This cannot be undone.",
-      "cancel": "Cancel",
       "resetDone": "Demo data reset",
       "resetFailed": "Reset stopped at {step}",
       "dropDone": "Demo data dropped",
@@ -92,7 +89,8 @@
       "pending": "Waiting",
       "running": "Running",
       "done": "Done",
-      "failed": "Failed"
+      "failed": "Failed",
+      "resetExisting": "No existing demo data is replaced | One part of the demo data is already there and will be replaced | {n} parts of the demo data are already there and will be replaced"
     },
     "collections": {
       "filter": "Filter collections",
@@ -114,7 +112,12 @@
       "otherTitle": "Something went wrong",
       "otherText": "The page could not be shown. Going back home usually helps.",
       "home": "Back to home",
-      "login": "Go to login"
+      "login": "Go to login",
+      "forbiddenTitle": "You may not open this page",
+      "forbiddenText": "Your roles do not include the right for it. An administrator can grant it.",
+      "unreachableTitle": "The MongoCamp server does not answer",
+      "unreachableText": "It may be restarting or unreachable from here. Try again in a moment.",
+      "back": "Go back"
     },
     "buckets": {
       "text": "GridFS buckets on this server: files with their metadata",

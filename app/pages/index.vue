@@ -3,20 +3,30 @@ definePageMeta({ layout: 'auth' })
 
 const { t } = useI18n()
 const { isLoggedIn } = useMongocampAuth()
-const isProxyMode = useProxyMode()
+const isProxyMode = useMongocampProxyMode()
+const paths = useMongocampPaths()
 
 useHead({ title: () => `${t('serverManagement.app.name')} ${t('serverManagement.app.product')}` })
 
-if (isLoggedIn.value) {
-  await navigateTo('/secured')
+// API key mode has nothing to sign in to, so the console opens straight away
+if (isLoggedIn.value || isProxyMode) {
+  await navigateTo(paths.home, { replace: true })
 }
+
+// Set by middleware/signed-out.global.ts; shown once, then a fresh sign-in starts clean
+const signedOut = useState('signed-out', () => false)
+const showSignedOut = ref(signedOut.value)
+signedOut.value = false
 </script>
 
 <template>
   <div class="grid min-h-svh lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
     <!-- The one bold moment: the camp's terrain and what the console is for -->
     <section class="relative flex min-h-56 flex-col justify-between overflow-hidden bg-muted p-6 sm:p-10 lg:min-h-svh">
-      <ContourArtwork class="absolute inset-0 size-full" />
+      <ContourArtwork
+        camp
+        class="absolute inset-0 size-full"
+      />
       <!-- Lets the lines run out under the headline instead of crossing it -->
       <div
         class="absolute inset-x-0 bottom-0 h-3/4"
@@ -48,29 +58,21 @@ if (isLoggedIn.value) {
     <section class="relative flex flex-col p-6 sm:p-10">
       <AppDisplayControls class="self-end" />
 
-      <div class="flex flex-1 items-center justify-center py-8">
+      <!-- Side by side, the form sits on the same bottom line as the headline across the page -->
+      <div class="flex flex-1 items-center justify-center py-8 lg:items-end lg:pb-0">
         <div
-          v-if="isProxyMode"
-          class="flex w-full max-w-sm flex-col gap-3"
+          v-if="!isLoggedIn"
+          class="flex w-full max-w-sm flex-col gap-4"
         >
-          <h2 class="text-xl font-semibold text-highlighted">
-            {{ t('serverManagement.login.proxyTitle') }}
-          </h2>
-          <p class="text-sm text-muted">
-            {{ t('serverManagement.login.proxyText') }}
-          </p>
-          <div>
-            <UButton to="/secured">
-              {{ t('serverManagement.login.proxyOpen') }}
-            </UButton>
-          </div>
-        </div>
-
-        <div
-          v-else-if="!isLoggedIn"
-          class="w-full max-w-sm"
-        >
-          <MongocampLogin redirect-path="/secured" />
+          <UAlert
+            v-if="showSignedOut"
+            color="success"
+            variant="subtle"
+            icon="i-lucide-log-out"
+            :title="t('serverManagement.login.signedOut')"
+            role="status"
+          />
+          <MongocampLogin :redirect-path="paths.home" />
         </div>
       </div>
     </section>

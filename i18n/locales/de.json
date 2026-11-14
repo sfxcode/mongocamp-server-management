@@ -46,9 +46,7 @@
     "login": {
       "headline": "Alle Collections, Benutzer und Jobs Ihres MongoCamp-Servers in einer Konsole.",
       "lead": "Dokumente durchsuchen und bearbeiten, Benutzer, Rollen und Rechte verwalten, den Server beobachten.",
-      "proxyTitle": "Diese Konsole nutzt einen API-Key",
-      "proxyText": "Eine Anmeldung ist nicht nötig. Alles läuft mit den Rechten des hinterlegten Keys.",
-      "proxyOpen": "Konsole öffnen"
+      "signedOut": "Sie sind abgemeldet."
     },
     "home": {
       "welcome": "Willkommen, {name}",
@@ -83,7 +81,6 @@
       "resetConfirmText": "Die sechs test_-Collections und der Bucket test_images werden gelöscht und neu befüllt.",
       "dropConfirmTitle": "Demodaten löschen?",
       "dropConfirmText": "Die sechs test_-Collections und der Bucket test_images werden gelöscht. Das lässt sich nicht rückgängig machen.",
-      "cancel": "Abbrechen",
       "resetDone": "Demodaten zurückgesetzt",
       "resetFailed": "Zurücksetzen bei {step} abgebrochen",
       "dropDone": "Demodaten gelöscht",
@@ -92,7 +89,8 @@
       "pending": "Wartet",
       "running": "Läuft",
       "done": "Fertig",
-      "failed": "Fehlgeschlagen"
+      "failed": "Fehlgeschlagen",
+      "resetExisting": "Es werden keine vorhandenen Demodaten ersetzt | Ein Teil der Demodaten ist schon da und wird ersetzt | {n} Teile der Demodaten sind schon da und werden ersetzt"
     },
     "collections": {
       "filter": "Collections filtern",
@@ -114,7 +112,12 @@
       "otherTitle": "Etwas ist schiefgelaufen",
       "otherText": "Die Seite konnte nicht angezeigt werden. Zurück zur Startseite hilft meistens.",
       "home": "Zur Startseite",
-      "login": "Zur Anmeldung"
+      "login": "Zur Anmeldung",
+      "forbiddenTitle": "Diese Seite ist für Sie nicht freigegeben",
+      "forbiddenText": "Ihren Rollen fehlt das Recht dafür. Ein Administrator kann es vergeben.",
+      "unreachableTitle": "Der MongoCamp-Server antwortet nicht",
+      "unreachableText": "Er startet vielleicht neu oder ist von hier aus nicht erreichbar. Versuchen Sie es gleich noch einmal.",
+      "back": "Zurück"
     },
     "buckets": {
       "text": "GridFS-Buckets auf diesem Server: Dateien mit ihren Metadaten",

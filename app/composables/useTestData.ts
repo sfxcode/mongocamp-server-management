@@ -96,5 +96,11 @@ export function useTestData() {
     { key: BUCKET, label: BUCKET, run: seedImages },
   ]
 
-  return { resetSteps, dropAll }
+  return {
+    resetSteps,
+    dropAll,
+    /** What the set consists of, to tell whether some of it is already on the server */
+    collectionNames: COLLECTIONS.map(seed => seed.collection),
+    bucketName: BUCKET,
+  }
 }
