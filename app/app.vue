@@ -13,6 +13,7 @@ useHead({ htmlAttrs: { lang: () => locale.value } })
       {{ t('serverManagement.app.skip') }}
     </a>
     <NuxtLoadingIndicator color="var(--ui-primary)" />
+    <NuxtRouteAnnouncer />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

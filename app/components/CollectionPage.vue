@@ -7,24 +7,28 @@ import type { TabsItem } from '@nuxt/ui'
  */
 const props = withDefaults(defineProps<{
   title: string
+  /** Shown under the heading; only with `heading` */
+  description?: string
   /** Set for the pages of one collection: shows its name and the tabs */
   collectionName?: string
   /** Show `title` as the heading (bucket pages; collections show their name with the tabs) */
   heading?: boolean
 }>(), {
+  description: undefined,
   collectionName: undefined,
   heading: false,
 })
 
 const { t } = useI18n()
 const route = useRoute()
+const paths = useMongocampPaths()
 const drawerOpen = useState('collection-drawer-open', () => false)
 
 function openDrawer() {
   drawerOpen.value = true
 }
 
-const base = computed(() => `/secured/admin/collections/${encodeURIComponent(props.collectionName ?? '')}`)
+const base = computed(() => `${paths.collections}/${encodeURIComponent(props.collectionName ?? '')}`)
 
 const tabs = computed<TabsItem[]>(() => [
   { label: t('serverManagement.nav.tabData'), icon: 'i-lucide-table', value: `${base.value}/data` },
@@ -47,6 +51,7 @@ const activeTab = computed({
 <template>
   <AppPage
     :title="title"
+    :description="description"
     :heading="heading"
   >
     <template #leading>
@@ -68,7 +73,8 @@ const activeTab = computed({
       v-if="collectionName"
       #toolbar
     >
-      <h1 class="min-w-0 truncate py-2 font-mono text-sm font-semibold text-highlighted">
+      <!-- On phones the name gets its own line instead of being cut to a few letters beside the tabs -->
+      <h1 class="min-w-0 basis-full truncate pt-2 font-mono text-sm font-semibold text-highlighted sm:basis-auto sm:py-2">
         {{ collectionName }}
       </h1>
       <UTabs
@@ -77,8 +83,8 @@ const activeTab = computed({
         :content="false"
         variant="link"
         size="sm"
-        class="ms-auto"
-        :ui="{ list: 'border-b-0', root: 'gap-0' }"
+        class="min-w-0 max-w-full sm:ms-auto"
+        :ui="{ list: 'border-b-0 overflow-x-auto', root: 'gap-0' }"
       />
     </template>
 

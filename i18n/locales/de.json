@@ -27,7 +27,8 @@
       "tabData": "Daten",
       "tabOverview": "Übersicht",
       "tabAggregate": "Aggregation",
-      "grantsOf": "Rechte von {role}"
+      "grantsOf": "Rechte von {role}",
+      "back": "Zurück zu {page}"
     },
     "user": {
       "administrator": "Administrator",

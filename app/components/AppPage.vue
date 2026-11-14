@@ -19,6 +19,7 @@ const props = withDefaults(defineProps<{
 
 const { t } = useI18n()
 const breadcrumbs = useBreadcrumbs()
+const parent = computed(() => breadcrumbs.value.at(-2))
 
 useHead({
   title: () => `${props.title} · ${t('serverManagement.app.name')} ${t('serverManagement.app.product')}`,
@@ -39,6 +40,16 @@ const widthClass = computed(() => ({
         <template #left>
           <UDashboardSidebarCollapse />
           <slot name="leading" />
+          <!-- Phones show only the last breadcrumb, so the way up gets its own button -->
+          <UButton
+            v-if="parent?.to"
+            :to="parent.to"
+            icon="i-lucide-arrow-left"
+            color="neutral"
+            variant="ghost"
+            class="sm:hidden"
+            :aria-label="t('serverManagement.nav.back', { page: parent.label })"
+          />
           <UBreadcrumb
             :items="breadcrumbs"
             :ui="{ list: 'min-w-0 max-sm:[&>li:not(:last-child)]:hidden', item: 'min-w-0', link: 'min-w-0 font-medium', linkLabel: 'truncate max-w-48 sm:max-w-80' }"
@@ -49,32 +60,39 @@ const widthClass = computed(() => ({
           <slot name="actions" />
         </template>
       </UDashboardNavbar>
-      <div
-        v-if="$slots.toolbar"
-        class="flex shrink-0 items-center gap-2 border-b border-default px-4 sm:px-6"
-      >
-        <slot name="toolbar" />
-      </div>
     </template>
 
     <template #body>
+      <!-- Focusable so navigation can move focus here (plugins/focus-main.client.ts); the toolbar is inside so
+           the skip link and the main landmark start at the collection's heading, not after it -->
       <main
         id="main"
-        class="flex w-full flex-col gap-6 p-4 sm:p-6"
-        :class="widthClass"
+        tabindex="-1"
+        class="flex flex-1 flex-col outline-none"
       >
-        <header v-if="heading">
-          <h1 class="text-xl font-semibold text-highlighted">
-            {{ title }}
-          </h1>
-          <p
-            v-if="description"
-            class="mt-1 max-w-prose text-sm text-muted"
-          >
-            {{ description }}
-          </p>
-        </header>
-        <slot />
+        <div
+          v-if="$slots.toolbar"
+          class="sticky top-0 z-20 flex shrink-0 flex-wrap items-center gap-x-2 border-b border-default bg-default px-4 sm:px-6"
+        >
+          <slot name="toolbar" />
+        </div>
+        <div
+          class="flex w-full flex-col gap-6 p-4 sm:p-6"
+          :class="widthClass"
+        >
+          <header v-if="heading">
+            <h1 class="text-xl font-semibold text-highlighted">
+              {{ title }}
+            </h1>
+            <p
+              v-if="description"
+              class="mt-1 max-w-prose text-sm text-muted"
+            >
+              {{ description }}
+            </p>
+          </header>
+          <slot />
+        </div>
       </main>
     </template>
   </UDashboardPanel>

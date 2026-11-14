@@ -14,7 +14,7 @@ function toggleLocale() {
       variant="ghost"
       icon="i-lucide-languages"
       :label="locale.toUpperCase()"
-      :aria-label="t('serverManagement.user.language')"
+      :aria-label="`${locale.toUpperCase()}, ${t('serverManagement.user.language')}`"
       @click="toggleLocale"
     />
     <UColorModeButton />
