@@ -8,6 +8,12 @@ export default defineNuxtConfig({
   ],
   ssr: false,
   devtools: { enabled: true },
+  app: {
+    head: {
+      // The mark of AppLogo.vue with fixed colours
+      link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
+    },
+  },
   css: ['~/assets/css/main.css'],
   compatibilityDate: 'latest',
   vite: {

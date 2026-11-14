@@ -1,12 +1,15 @@
 <script setup lang="ts">
 /**
  * Contour lines of an imaginary camp site: two summits, drawn as nested closed curves.
- * Purely decorative and static; one line is in the accent colour.
+ * Purely decorative and static; one line is in the accent colour. With `camp` the tent of the logo
+ * stands on the first summit.
  */
 const props = withDefaults(defineProps<{
   /** Fewer, fainter lines for error screens */
   quiet?: boolean
-}>(), { quiet: false })
+  /** Pitch the logo's tent on the main summit (it sits on `bg-muted`, the sign-in hero's surface) */
+  camp?: boolean
+}>(), { quiet: false, camp: false })
 
 interface Summit {
   x: number
@@ -23,6 +26,9 @@ const SUMMITS: Summit[] = [
 ]
 
 const POINTS = 72
+// The tent and the clearing around it, which takes the place of the innermost rings
+const CAMP_SIZE = 104
+const CAMP_CLEARING = 3
 
 function ring(summit: Summit, index: number): string {
   const radius = 22 + index * summit.step
@@ -41,13 +47,18 @@ function ring(summit: Summit, index: number): string {
 
 const lines = computed(() => SUMMITS.flatMap((summit, summitIndex) =>
   Array.from({ length: props.quiet ? Math.ceil(summit.rings / 2) : summit.rings }, (_, index) => ({
+    index,
+    summitIndex,
     key: `${summitIndex}-${index}`,
     d: ring(summit, props.quiet ? index * 2 : index),
     // Every fifth line is an index contour, drawn stronger
     strong: index % 5 === 0,
     accent: summitIndex === 0 && index === 3 && !props.quiet,
   })),
-))
+).filter(line => !(props.camp && line.summitIndex === 0 && line.index < CAMP_CLEARING)))
+
+// Where the tent stands
+const site = SUMMITS[0]!
 </script>
 
 <template>
@@ -65,6 +76,13 @@ const lines = computed(() => SUMMITS.flatMap((summit, summitIndex) =>
       :stroke-width="line.accent ? 2.5 : line.strong ? 1.5 : 1"
       :opacity="line.accent ? 1 : quiet ? 0.18 : line.strong ? 0.5 : 0.28"
       stroke-linejoin="round"
+    />
+    <AppLogo
+      v-if="camp"
+      :x="site.x - CAMP_SIZE / 2"
+      :y="site.y - CAMP_SIZE / 2"
+      :width="CAMP_SIZE"
+      :height="CAMP_SIZE"
     />
   </svg>
 </template>
