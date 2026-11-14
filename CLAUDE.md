@@ -24,6 +24,9 @@ pnpm lint       # eslint . (lint:fix to apply fixes)
 pnpm typecheck  # nuxt typecheck (vue-tsc; TypeScript stays on 6.x, vue-tsc does not run on 7)
 ```
 
+- `docker build -t mongocamp-server-management .` builds the image (see README, Docker). API key mode is a
+  **build** argument (`MONGOCAMP_USE_SERVER_PROXY`); the server URL and the API key are **runtime** variables
+  (`NUXT_PUBLIC_MONGOCAMP_URL`, `NUXT_MONGOCAMP_API_KEY`). Never add the API key as a build argument or `ENV`.
 - Port 3000 is required: the development MongoCamp server only allows that origin (CORS).
 - There is no test suite; check changes with `lint`, `typecheck` and screenshots.
 - Screenshots for visual checks (dev server running, admin login in `.env`, Chrome installed):

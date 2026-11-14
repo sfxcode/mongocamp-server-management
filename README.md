@@ -29,6 +29,38 @@ Copy `.env.example` to `.env`.
 | `MONGOCAMP_API_KEY` | The key for API key mode; stays on the server |
 | `MONGOCAMP_PROXY_SHARED_SECRET` | If set, callers of the proxy must send it as `x-mongocamp-proxy-secret` |
 
+## Docker
+
+The build is a self-contained Node server (the single-page app plus the API key proxy), so the image holds only
+`.output` and runs as the unprivileged `node` user on port 3000.
+
+```bash
+docker build -t mongocamp-server-management .
+docker run -p 3000:3000 -e NUXT_PUBLIC_MONGOCAMP_URL=https://mongocamp.example.com mongocamp-server-management
+```
+
+In login mode the browser calls the MongoCamp server directly, so `NUXT_PUBLIC_MONGOCAMP_URL` has to be an address the
+browser can reach, and that server has to allow the console's origin (CORS).
+
+| Where | Variable | Purpose |
+|---|---|---|
+| build argument | `MONGOCAMP_USE_SERVER_PROXY` | `true` builds API key mode (no login, no route guards). Decided when building, because it switches the guards |
+| build argument | `MONGOCAMP_URL` | Default server URL baked into the build (`http://localhost:8080`) |
+| container | `NUXT_PUBLIC_MONGOCAMP_URL` | The MongoCamp server, set when the container starts |
+| container | `NUXT_MONGOCAMP_API_KEY` | The key for API key mode; there is deliberately no build argument for it, so it never ends up in an image layer |
+| container | `MONGOCAMP_PROXY_SHARED_SECRET` | If set, callers of the proxy must send it as `x-mongocamp-proxy-secret` |
+
+```bash
+docker build --build-arg MONGOCAMP_USE_SERVER_PROXY=true -t mongocamp-server-management:proxy .
+docker run -p 3000:3000 \
+  -e NUXT_PUBLIC_MONGOCAMP_URL=https://mongocamp.example.com \
+  -e NUXT_MONGOCAMP_API_KEY=... -e MONGOCAMP_PROXY_SHARED_SECRET=... \
+  mongocamp-server-management:proxy
+```
+
+`.env` is not copied into the image (`.dockerignore`). The container has a health check on `/`. The fonts are fetched
+while building, so the build needs network access.
+
 ## Where things are
 
 | Path | What |
