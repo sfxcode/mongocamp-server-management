@@ -2,6 +2,7 @@
 definePageMeta({ layout: 'collection' })
 
 const route = useRoute()
+const paths = useMongocampPaths()
 const collectionName = computed(() => String(route.params.collection_name))
 const list = useTemplateRef<{ refresh: () => unknown }>('list')
 </script>
@@ -20,7 +21,7 @@ const list = useTemplateRef<{ refresh: () => unknown }>('list')
       ref="list"
       :key="collectionName"
       :collection-name="collectionName"
-      aggregate-path="/secured/admin/collections"
+      :aggregate-path="paths.collections"
       hide-refresh
     />
   </CollectionPage>

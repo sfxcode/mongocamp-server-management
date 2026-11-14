@@ -8,6 +8,7 @@ const list = useTemplateRef<{ refresh: () => unknown }>('list')
     :title="t('serverManagement.nav.roles')"
     heading
     :description="t('serverManagement.home.rolesText')"
+    width="default"
   >
     <template #actions>
       <PageReload :target="list" />

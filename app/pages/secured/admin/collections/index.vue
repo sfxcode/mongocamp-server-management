@@ -2,18 +2,15 @@
 definePageMeta({ layout: 'collection' })
 
 const { t } = useI18n()
-const names = useState<string[] | null>('collection-panel-names', () => null)
-
-// A drop, rename, copy or clear changes what the collection panel lists
-function reloadPanel() {
-  names.value = null
-}
+// The collection panel needs no reload from here: `MongocampCollections` writes every list it loads
+// (after a drop, rename, copy or clear too) into the shared `useMongocampCollectionNames()` cache
 const list = useTemplateRef<{ refresh: () => unknown }>('list')
 </script>
 
 <template>
   <CollectionPage
     :title="t('serverManagement.nav.collections')"
+    :description="t('serverManagement.home.collectionsText')"
     heading
   >
     <template #actions>
@@ -24,7 +21,6 @@ const list = useTemplateRef<{ refresh: () => unknown }>('list')
       ref="list"
       hide-heading
       hide-refresh
-      @changed="reloadPanel"
     />
   </CollectionPage>
 </template>

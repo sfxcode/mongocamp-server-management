@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { t } = useI18n()
+const list = useTemplateRef<{ refresh: () => unknown }>('list')
 </script>
 
 <template>
@@ -9,6 +10,14 @@ const { t } = useI18n()
     :description="t('serverManagement.home.settingsText')"
     width="default"
   >
-    <MongocampSettings hide-heading />
+    <template #actions>
+      <PageReload :target="list" />
+    </template>
+
+    <MongocampSettings
+      ref="list"
+      hide-heading
+      hide-refresh
+    />
   </AppPage>
 </template>

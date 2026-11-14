@@ -1,6 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'collection' })
 
+const { t } = useI18n()
 const route = useRoute()
 const bucketName = computed(() => String(route.params.bucket_name))
 const list = useTemplateRef<{ refresh: () => unknown }>('list')
@@ -9,6 +10,7 @@ const list = useTemplateRef<{ refresh: () => unknown }>('list')
 <template>
   <CollectionPage
     :title="bucketName"
+    :description="t('serverManagement.collections.bucketText')"
     heading
   >
     <template #actions>
