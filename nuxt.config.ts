@@ -6,6 +6,7 @@ const useServerProxy = process.env.MONGOCAMP_USE_SERVER_PROXY === 'true'
 export default defineNuxtConfig({
   modules: [
     '@sfxcode/nuxt-ui-mongocamp',
+    '@nuxt/fonts',
   ],
   ssr: false,
   devtools: { enabled: true },
@@ -35,6 +36,12 @@ export default defineNuxtConfig({
   fonts: {
     // The families are declared as --font-sans / --font-mono in main.css
     processCSSVariables: true,
+    // Only what the console renders: no italics, and English/German need just the Latin subsets
+    defaults: {
+      weights: [400, 500, 600, 700],
+      styles: ['normal'],
+      subsets: ['latin', 'latin-ext'],
+    },
   },
   // No /de prefix: the /secured/** route guards below match on the plain path
   i18n: {

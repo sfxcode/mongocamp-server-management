@@ -4,8 +4,9 @@
  * app.config.ts maps them onto Nuxt UI's semantic colours.
  */
 :root {
-  --font-sans: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  /* One superfamily: the sans for the interface, its mono for documents, ids and queries */
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
   --color-lake-50: oklch(97% 0.015 205);
   --color-lake-100: oklch(94% 0.03 205);
@@ -57,6 +58,15 @@
   --ui-bg-accented: var(--ui-color-neutral-300);
   --ui-border: var(--ui-color-neutral-200);
   --ui-border-accented: var(--ui-color-neutral-300);
+  /* Between stone steps: the defaults (400 / 500) fall below 4.5:1 on the sidebar and on bg-elevated */
+  --ui-text-dimmed: oklch(50% 0.014 174);
+  --ui-text-muted: oklch(42% 0.014 176);
+  /* Status colours darker than the 500 default: as text on their own 10 % tint (subtle badges, alerts) the
+     500s stay under 4.5:1; green and amber are the brightest hues and need one step more */
+  --ui-success: var(--ui-color-success-800);
+  --ui-info: var(--ui-color-info-700);
+  --ui-warning: var(--ui-color-warning-800);
+  --ui-error: var(--ui-color-error-700);
 
   /* Chart series: fixed order, checked with the dataviz palette validator against this surface */
   --ui-chart-1: #00789c;
@@ -77,6 +87,14 @@
   --ui-bg-accented: var(--ui-color-neutral-700);
   --ui-border: var(--ui-color-neutral-800);
   --ui-border-accented: var(--ui-color-neutral-700);
+  /* At least 4.5:1 on bg-elevated and the chips on it; the default dimmed (500) is at 3.3:1 */
+  --ui-text-dimmed: oklch(68% 0.012 172);
+  --ui-text-muted: oklch(75% 0.01 171);
+  /* Restated because the light values above are unlayered and would otherwise win over Nuxt UI's dark ones */
+  --ui-success: var(--ui-color-success-400);
+  --ui-info: var(--ui-color-info-400);
+  --ui-warning: var(--ui-color-warning-400);
+  --ui-error: var(--ui-color-error-400);
 
   --ui-chart-1: #0b9db3;
   --ui-chart-2: #ce6330;
@@ -90,8 +108,8 @@ html {
   font-family: var(--font-sans);
 }
 
-/* Figures line up in stat cards. Not set on whole tables: this typeface also widens the punctuation
-   around tabular figures, which pulls apart e-mail addresses and dates. */
+/* Figures line up in stat cards and counts. Opt-in rather than set on whole tables, where
+   e-mail addresses and dates read better with proportional spacing. */
 .tabular {
   font-variant-numeric: tabular-nums;
 }
