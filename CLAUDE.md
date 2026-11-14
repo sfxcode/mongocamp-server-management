@@ -27,6 +27,8 @@ pnpm typecheck  # nuxt typecheck (vue-tsc; TypeScript stays on 6.x, vue-tsc does
 - `docker build -t mongocamp-server-management .` builds the image (see README, Docker). API key mode is a
   **build** argument (`MONGOCAMP_USE_SERVER_PROXY`); the server URL and the API key are **runtime** variables
   (`NUXT_PUBLIC_MONGOCAMP_URL`, `NUXT_MONGOCAMP_API_KEY`). Never add the API key as a build argument or `ENV`.
+  `.github/workflows/docker.yml` publishes both variants to ghcr.io (`edge` from main, `X.Y.Z` / `latest` from `vX.Y.Z`
+  tags, `-proxy` suffix for API key mode); pull requests only build.
 - Port 3000 is required: the development MongoCamp server only allows that origin (CORS).
 - There is no test suite; check changes with `lint`, `typecheck` and screenshots.
 - Screenshots for visual checks (dev server running, admin login in `.env`, Chrome installed):

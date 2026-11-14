@@ -58,6 +58,19 @@ docker run -p 3000:3000 \
   mongocamp-server-management:proxy
 ```
 
+### Published images
+
+`.github/workflows/docker.yml` builds both variants (linux/amd64 and arm64) and pushes them to the GitHub container
+registry: from `main` (`edge`) and from version tags (`v1.2.3` gives `1.2.3`, `1.2` and `latest`). The API key variant
+repeats every tag with `-proxy`. A pull request only builds the image, it pushes nothing.
+
+```bash
+docker run -p 3000:3000 -e NUXT_PUBLIC_MONGOCAMP_URL=https://mongocamp.example.com ghcr.io/sfxcode/mongocamp-server-management:latest
+docker run -p 3000:3000 -e NUXT_PUBLIC_MONGOCAMP_URL=... -e NUXT_MONGOCAMP_API_KEY=... ghcr.io/sfxcode/mongocamp-server-management:latest-proxy
+```
+
+A package is private after its first push; make it public once under the repository's Packages settings.
+
 `.env` is not copied into the image (`.dockerignore`). The container has a health check on `/`. The fonts are fetched
 while building, so the build needs network access.
 
