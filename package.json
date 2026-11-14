@@ -1,6 +1,21 @@
 {
-  "private": true,
-  "name": "nuxt-app",
+  "private": false,
+  "name": "@sfxcode/mongocamp-server-management",
+  "version": "1.0.0",
+  "description": "A designed admin console for a MongoCamp server: collections, documents, buckets, users, roles, jobs and server info",
+  "repository": "sfxcode/mongocamp-server-management",
+  "homepage": "https://github.com/sfxcode/mongocamp-server-management#readme",
+  "bugs": "https://github.com/sfxcode/mongocamp-server-management/issues",
+  "author": "sfxcode",
+  "license": "MIT",
+  "keywords": [
+    "nuxt",
+    "mongocamp",
+    "mongodb",
+    "vue",
+    "nuxt-ui",
+    "admin"
+  ],
   "type": "module",
   "scripts": {
     "build": "nuxt build",
