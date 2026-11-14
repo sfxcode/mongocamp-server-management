@@ -3,20 +3,15 @@
 A designed admin console on top of `@sfxcode/nuxt-ui-mongocamp`: everything the module's playground can do, in a
 sidebar shell with its own theme, English and German.
 
-This folder is **unmanaged**: it is listed in `.git/info/exclude`, is not a pnpm workspace member and has no
-dependencies of its own. It imports the module from the repository root (`import NuxtUIMongocamp from '../..'`) and
-resolves every package from the root `node_modules`.
+It is a normal consumer of the published package (`@sfxcode/nuxt-ui-mongocamp` from npm, listed in `modules`), with
+its own dependencies.
 
 ## Run
 
-From the repository root:
-
 ```bash
-pnpm run dev:prepare                                         # once, and after module source changes
-pnpm exec nuxt dev .work/mongocamp-server-management         # http://localhost:3000
-pnpm exec nuxt typecheck .work/mongocamp-server-management
-(cd .work/mongocamp-server-management && pnpm exec eslint .)
-pnpm exec nuxt build .work/mongocamp-server-management
+pnpm install
+pnpm dev          # http://localhost:3000
+pnpm build
 ```
 
 The app uses port 3000, the same as the playground: the development MongoCamp server only allows that origin (CORS),
@@ -42,9 +37,22 @@ Copy `.env.example` to `.env`.
 | `app/app.config.ts` | Maps the scales onto Nuxt UI's colours and restyles tables, cards, modals |
 | `app/layouts/default.vue`, `collection.vue`, `auth.vue` | Sidebar shell, shell plus collection panel, signed-out screens |
 | `app/components/AppPage.vue`, `CollectionPage.vue` | Page frames: breadcrumb, actions, tabs |
-| `app/components/ServerStatusRail.vue` | Server name, versions, connections and uptime in the sidebar |
+| `app/components/AppSidebar.vue`, `CollectionPanel.vue` | Sidebar (menu, search, `MongocampServerStatus`, user menu) and the collection list |
+| `app/composables/useNavItems.ts`, `useBreadcrumbs.ts` | The module's navigation and breadcrumb data, with the Buckets crumb pointed at the console's buckets list |
+| `public/data/` | The demo data set the test data panel loads |
 | `app/components/TestDataPanel.vue`, `app/composables/useTestData.ts` | Demo data reset and drop |
 | `i18n/locales/` | The console's own strings (`serverManagement.*`); the module brings its own |
 | `scripts/shots.mjs` | Screenshots through the installed Chrome: `node scripts/shots.mjs <outDir> [--dark] [--width=390] <route>…` |
 
+## What comes from the module
 
+Since `@sfxcode/nuxt-ui-mongocamp` 1.5.3 the console no longer carries its own copies of these:
+
+| Need | From the module |
+|---|---|
+| Sidebar menu, breadcrumb | `useMongocampNavigation()`, `useMongocampBreadcrumbs()` |
+| Links to the pages | `useMongocampPaths()` (module option `paths`; this app keeps the default `/secured/...` routes) |
+| Collection list shared by the panel | `useMongocampCollectionNames()` — the collections table keeps it current |
+| Roles for what to show, API key mode | `useMongocampRoles()` (`canSeeAdmin`, `canSeeManagement`), `useMongocampProxyMode()` |
+| Server status in the sidebar | `MongocampServerStatus` |
+| "Your access" for users who are not administrators | `MongocampUserAccess` |

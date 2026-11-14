@@ -1,11 +1,8 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const items = useNavItems()
-const paletteOpen = useState('command-palette-open', () => false)
-
-function openPalette() {
-  paletteOpen.value = true
-}
+const paths = useMongocampPaths()
+const { show: openPalette } = useCommandPalette()
 </script>
 
 <template>
@@ -20,9 +17,9 @@ function openPalette() {
   >
     <template #header="{ collapsed }">
       <NuxtLink
-        to="/secured"
+        :to="paths.home"
         class="flex min-w-0 items-center gap-2.5"
-        :aria-label="t('serverManagement.app.name')"
+        :aria-label="collapsed ? t('serverManagement.app.name') : undefined"
       >
         <AppLogo class="size-7 shrink-0" />
         <span
@@ -42,13 +39,19 @@ function openPalette() {
         icon="i-lucide-search"
         :square="collapsed"
         :block="!collapsed"
-        :aria-label="t('serverManagement.nav.searchHint')"
+        :aria-label="collapsed ? `${t('serverManagement.nav.search')}: ${t('serverManagement.nav.searchHint')}` : undefined"
         class="justify-start bg-default"
         @click="openPalette"
       >
+        <!-- Expanded, the visible word is the name (voice control: "click Search"); the hint is read after it -->
         <template v-if="!collapsed">
-          <span class="flex-1 text-start font-normal text-muted">{{ t('serverManagement.nav.search') }}</span>
-          <span class="flex gap-0.5">
+          <span class="flex-1 text-start font-normal text-muted">
+            {{ t('serverManagement.nav.search') }}<span class="sr-only">: {{ t('serverManagement.nav.searchHint') }}</span>
+          </span>
+          <span
+            class="flex gap-0.5"
+            aria-hidden="true"
+          >
             <UKbd value="meta" />
             <UKbd value="K" />
           </span>
@@ -66,7 +69,10 @@ function openPalette() {
     </template>
 
     <template #footer="{ collapsed }">
-      <ServerStatusRail :collapsed="collapsed" />
+      <MongocampServerStatus
+        :collapsed="collapsed"
+        :class="collapsed ? '' : 'px-2.5 py-2'"
+      />
       <AppUserMenu :collapsed="collapsed" />
     </template>
   </UDashboardSidebar>

@@ -1,14 +1,5 @@
-<script setup lang="ts">
-const paletteOpen = useState('command-palette-open', () => false)
-</script>
-
 <template>
-  <UDashboardGroup unit="rem">
-    <AppSidebar />
+  <AppShell>
     <slot />
-    <MongocampCommandPalette
-      v-model:open="paletteOpen"
-      logout-path="/logout"
-    />
-  </UDashboardGroup>
+  </AppShell>
 </template>

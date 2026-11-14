@@ -1,5 +1,3 @@
-import { fileURLToPath } from 'node:url'
-
 // Server proxy mode has no login, so there is nothing for the route guards to unlock
 const useServerProxy = process.env.MONGOCAMP_USE_SERVER_PROXY === 'true'
 
@@ -12,12 +10,6 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
   compatibilityDate: 'latest',
-  nitro: {
-    // The demo data (/data/*.json) is served from the playground, not copied
-    publicAssets: [
-      { dir: fileURLToPath(new URL('../../playground/public', import.meta.url)) },
-    ],
-  },
   vite: {
     optimizeDeps: {
       include: [

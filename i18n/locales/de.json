@@ -4,7 +4,8 @@
       "name": "MongoCamp",
       "product": "Serververwaltung",
       "skip": "Zum Inhalt springen",
-      "reload": "Neu laden"
+      "reload": "Neu laden",
+      "reloaded": "Aktualisiert"
     },
     "nav": {
       "home": "Start",
@@ -12,9 +13,6 @@
       "manager": "Manager",
       "managerArea": "Managerbereich",
       "admin": "Admin",
-      "access": "Zugriff",
-      "data": "Daten",
-      "serverGroup": "Server",
       "users": "Benutzer",
       "roles": "Rollen",
       "permissions": "Berechtigungen",
@@ -27,7 +25,6 @@
       "settings": "Einstellungen",
       "search": "Suchen",
       "searchHint": "Collection, Benutzer, Rolle oder Job finden",
-      "grants": "Rechte",
       "tabData": "Daten",
       "tabOverview": "Übersicht",
       "tabAggregate": "Aggregation",
@@ -77,24 +74,6 @@
       "adminHint": "Als Administrator haben Sie die vollständige Serverübersicht.",
       "openOverview": "Übersicht öffnen"
     },
-    "access": {
-      "title": "Ihr Zugriff",
-      "collections": "Collections",
-      "canRead": "Lesbar",
-      "canWrite": "Schreibbar",
-      "canAdministrate": "Verwaltbar",
-      "collection": "Collection",
-      "read": "Lesen",
-      "write": "Schreiben",
-      "administrate": "Verwalten",
-      "yes": "Ja",
-      "no": "Nein",
-      "reload": "Neu laden",
-      "failed": "Ihr Zugriff konnte nicht geladen werden.",
-      "retry": "Erneut versuchen",
-      "emptyTitle": "Noch keine Collections",
-      "emptyText": "Bitten Sie einen Administrator, einer Ihrer Rollen ein Collection-Recht zu geben."
-    },
     "testData": {
       "title": "Demodaten",
       "text": "Sechs verknüpfte Shop-Collections und ein Bild-Bucket zum Ausprobieren der Konsole.",
@@ -124,17 +103,6 @@
       "all": "Alle Collections",
       "open": "Collections anzeigen"
     },
-    "rail": {
-      "reachable": "Server erreichbar",
-      "partial": "Server erreichbar, Last unbekannt",
-      "down": "Server nicht erreichbar",
-      "connections": "Verbindungen",
-      "uptime": "Läuft seit {time}",
-      "details": "Serverstatus",
-      "days": "{n} T",
-      "hours": "{n} Std",
-      "minutes": "{n} Min"
-    },
     "error": {
       "notFoundTitle": "Diese Seite gibt es nicht",
       "notFoundText": "Die Adresse ist vielleicht falsch, oder die Collection wurde umbenannt oder gelöscht.",
@@ -142,6 +110,28 @@
       "otherText": "Die Seite konnte nicht angezeigt werden. Zurück zur Startseite hilft meistens.",
       "home": "Zur Startseite",
       "login": "Zur Anmeldung"
+    },
+    "shortcuts": {
+      "title": "Tastenkürzel",
+      "description": "Funktionieren überall, außer beim Tippen in einem Feld.",
+      "then": "dann",
+      "palette": "⌘K (Strg K) öffnet die Befehlspalette.",
+      "group": {
+        "general": "Allgemein",
+        "navigation": "Gehe zu",
+        "collection": "Diese Collection"
+      },
+      "help": "Diese Liste zeigen",
+      "filter": "Collections filtern",
+      "reload": "Seite neu laden",
+      "home": "Start",
+      "collections": "Collections",
+      "buckets": "Buckets",
+      "users": "Benutzer",
+      "server": "Serverstatus",
+      "data": "Daten",
+      "overview": "Übersicht",
+      "aggregate": "Aggregation"
     }
   }
 }

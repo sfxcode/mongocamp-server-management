@@ -5,11 +5,13 @@ defineProps<{
   collapsed?: boolean
 }>()
 
-const { t, locale, setLocale } = useI18n()
+const { t, locale, locales, setLocale } = useI18n()
 const colorMode = useColorMode()
 const state = useMongocampStorage()
-const { isAdmin, isManager } = useConsoleRoles()
-const isProxyMode = useProxyMode()
+const { canSeeAdmin: isAdmin, canSeeManagement: isManager } = useMongocampRoles()
+const isProxyMode = useMongocampProxyMode()
+const paths = useConsolePaths()
+const shortcutsOpen = useState('shortcuts-help-open', () => false)
 
 const name = computed(() => isProxyMode ? t('serverManagement.user.apiKey') : (state.value?.profile?.user ?? ''))
 
@@ -20,7 +22,7 @@ const role = computed(() => {
   return t('serverManagement.user.standard')
 })
 
-function chooseLocale(code: 'en' | 'de') {
+function chooseLocale(code: typeof locale.value) {
   setLocale(code)
 }
 
@@ -35,8 +37,9 @@ const items = computed<DropdownMenuItem[][]>(() => {
     checked: colorMode.preference === preference,
     onSelect: () => chooseAppearance(preference),
   }))
-  const languages = ([['en', 'English'], ['de', 'Deutsch']] as const).map(([code, label]) => ({
-    label,
+  // Names come from the locale list in nuxt.config.ts, each in its own language
+  const languages = locales.value.map(({ code, name }) => ({
+    label: name ?? code,
     type: 'checkbox' as const,
     checked: locale.value === code,
     onSelect: () => chooseLocale(code),
@@ -45,14 +48,15 @@ const items = computed<DropdownMenuItem[][]>(() => {
   const groups: DropdownMenuItem[][] = [
     [{ type: 'label', label: name.value, description: role.value }],
     [
-      ...(isProxyMode ? [] : [{ label: t('serverManagement.nav.account'), icon: 'i-lucide-circle-user', to: '/secured/account' }]),
+      ...(isProxyMode ? [] : [{ label: t('serverManagement.nav.account'), icon: 'i-lucide-circle-user', to: paths.account }]),
       { label: t('serverManagement.user.language'), icon: 'i-lucide-languages', children: languages },
       { label: t('serverManagement.user.appearance'), icon: 'i-lucide-sun-moon', children: appearance },
+      { label: t('serverManagement.shortcuts.title'), icon: 'i-lucide-keyboard', kbds: ['?'], onSelect: () => (shortcutsOpen.value = true) },
     ],
   ]
   // Nothing to log out of in API key mode
   if (!isProxyMode) {
-    groups.push([{ label: t('serverManagement.user.logout'), icon: 'i-lucide-log-out', to: '/logout' }])
+    groups.push([{ label: t('serverManagement.user.logout'), icon: 'i-lucide-log-out', to: paths.logout }])
   }
   return groups
 })
@@ -69,13 +73,15 @@ const items = computed<DropdownMenuItem[][]>(() => {
       variant="ghost"
       block
       :square="collapsed"
-      :aria-label="t('serverManagement.user.menu')"
+      :aria-label="collapsed ? (name ? `${name}: ${t('serverManagement.user.menu')}` : t('serverManagement.user.menu')) : undefined"
       class="justify-start data-[state=open]:bg-elevated"
       :class="collapsed ? 'justify-center' : ''"
     >
+      <!-- Decorative: the button's name already says who is signed in -->
       <UAvatar
-        :alt="name"
+        :alt="name || role"
         size="xs"
+        aria-hidden="true"
       />
       <span
         v-if="!collapsed"
@@ -83,6 +89,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
       >
         <span class="truncate text-sm font-medium text-highlighted">{{ name }}</span>
         <span class="truncate text-xs font-normal text-muted">{{ role }}</span>
+        <span class="sr-only">{{ t('serverManagement.user.menu') }}</span>
       </span>
       <UIcon
         v-if="!collapsed"

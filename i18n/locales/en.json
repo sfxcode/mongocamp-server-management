@@ -4,7 +4,8 @@
       "name": "MongoCamp",
       "product": "Server Management",
       "skip": "Skip to content",
-      "reload": "Reload"
+      "reload": "Reload",
+      "reloaded": "Updated"
     },
     "nav": {
       "home": "Home",
@@ -12,9 +13,6 @@
       "manager": "Manager",
       "managerArea": "Manager area",
       "admin": "Admin",
-      "access": "Access",
-      "data": "Data",
-      "serverGroup": "Server",
       "users": "Users",
       "roles": "Roles",
       "permissions": "Permissions",
@@ -27,7 +25,6 @@
       "settings": "Settings",
       "search": "Search",
       "searchHint": "Find a collection, user, role or job",
-      "grants": "Grants",
       "tabData": "Data",
       "tabOverview": "Overview",
       "tabAggregate": "Aggregate",
@@ -77,24 +74,6 @@
       "adminHint": "As an administrator you have the full server overview.",
       "openOverview": "Open the overview"
     },
-    "access": {
-      "title": "Your access",
-      "collections": "Collections",
-      "canRead": "Can read",
-      "canWrite": "Can write",
-      "canAdministrate": "Can administrate",
-      "collection": "Collection",
-      "read": "Read",
-      "write": "Write",
-      "administrate": "Administrate",
-      "yes": "Yes",
-      "no": "No",
-      "reload": "Reload",
-      "failed": "Your access could not be loaded.",
-      "retry": "Try again",
-      "emptyTitle": "No collections yet",
-      "emptyText": "Ask an administrator to give one of your roles a collection grant."
-    },
     "testData": {
       "title": "Demo data",
       "text": "Six linked shop collections and an image bucket to try the console with.",
@@ -124,17 +103,6 @@
       "all": "All collections",
       "open": "Show collections"
     },
-    "rail": {
-      "reachable": "Server reachable",
-      "partial": "Server reachable, load unknown",
-      "down": "Server unreachable",
-      "connections": "Connections",
-      "uptime": "Up for {time}",
-      "details": "Server status",
-      "days": "{n} d",
-      "hours": "{n} h",
-      "minutes": "{n} min"
-    },
     "error": {
       "notFoundTitle": "This page does not exist",
       "notFoundText": "The address may be mistyped, or the collection was renamed or dropped.",
@@ -142,6 +110,28 @@
       "otherText": "The page could not be shown. Going back home usually helps.",
       "home": "Back to home",
       "login": "Go to login"
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "description": "They work anywhere except while typing in a field.",
+      "then": "then",
+      "palette": "⌘K (Ctrl K) opens the command palette.",
+      "group": {
+        "general": "General",
+        "navigation": "Go to",
+        "collection": "This collection"
+      },
+      "help": "Show this list",
+      "filter": "Filter collections",
+      "reload": "Reload the page",
+      "home": "Home",
+      "collections": "Collections",
+      "buckets": "Buckets",
+      "users": "Users",
+      "server": "Server status",
+      "data": "Data",
+      "overview": "Overview",
+      "aggregate": "Aggregate"
     }
   }
 }
