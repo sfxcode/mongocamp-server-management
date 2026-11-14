@@ -2,8 +2,8 @@
 /** The default shell plus the collection panel: a second column on wide screens, a drawer below. */
 const { t } = useI18n()
 const route = useRoute()
-const paletteOpen = useState('command-palette-open', () => false)
 const drawerOpen = useState('collection-drawer-open', () => false)
+provideCollectionPanel()
 
 // Choosing a collection in the drawer closes it
 watch(() => route.path, () => {
@@ -12,9 +12,7 @@ watch(() => route.path, () => {
 </script>
 
 <template>
-  <UDashboardGroup unit="rem">
-    <AppSidebar />
-
+  <AppShell>
     <UDashboardPanel
       id="collection-panel"
       resizable
@@ -41,10 +39,5 @@ watch(() => route.path, () => {
         <CollectionPanel />
       </template>
     </USlideover>
-
-    <MongocampCommandPalette
-      v-model:open="paletteOpen"
-      logout-path="/logout"
-    />
-  </UDashboardGroup>
+  </AppShell>
 </template>

@@ -2,40 +2,24 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 /**
- * Every collection one click away while working in one: ordinary collections, GridFS buckets and
- * MongoCamp's own `mc_*` collections, with a filter on top. The list is loaded once and shared;
- * pages that change it (drop, rename, copy, demo data) set the shared state to `null` to reload.
+ * Every collection one click away while working in one: recently opened ones, ordinary collections, GridFS
+ * buckets and MongoCamp's own `mc_*` collections, with a filter on top. The list is the module's shared one
+ * (`useMongocampCollectionNames()`): loaded once, and kept current by the collections table after a drop,
+ * rename or copy. Folded groups and recents are remembered per user (`useCollectionPanel()`).
  */
 const { t } = useI18n()
 const route = useRoute()
-const { listCollections } = useMongocampAdmin()
+const paths = useMongocampPaths()
+const panel = useCollectionPanel()
+const { names, collections, buckets, system, status, load, refresh } = useMongocampCollectionNames()
 
-const names = useState<string[] | null>('collection-panel-names', () => null)
-const failed = ref(false)
-const loading = ref(false)
 const search = ref('')
+const needle = computed(() => search.value.trim().toLowerCase())
+const failed = computed(() => status.value === 'failed' && names.value.length === 0)
+const loading = computed(() => status.value === 'loading' || status.value === 'idle')
+const results = useTemplateRef<HTMLElement>('results')
 
-async function load() {
-  loading.value = true
-  failed.value = false
-  try {
-    names.value = (await listCollections()) ?? []
-  }
-  catch {
-    failed.value = true
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-// Also reloads when a page invalidates the shared list
-watch(names, (value) => {
-  if (value === null && !loading.value) load()
-}, { immediate: true })
-
-const COLLECTION_BASE = '/secured/admin/collections'
-const BUCKET_BASE = '/secured/admin/buckets'
+onMounted(() => load())
 
 function isActive(base: string): boolean {
   let path = route.path
@@ -50,45 +34,91 @@ function isActive(base: string): boolean {
 }
 
 function collectionItem(name: string): NavigationMenuItem {
-  const base = `${COLLECTION_BASE}/${encodeURIComponent(name)}`
+  const base = `${paths.collections}/${encodeURIComponent(name)}`
   return { label: name, to: `${base}/data`, active: isActive(base) }
 }
 
-const groups = computed(() => {
-  const needle = search.value.trim().toLowerCase()
-  const all = (names.value ?? []).filter(name => !needle || name.toLowerCase().includes(needle)).sort((a, b) => a.localeCompare(b))
+function bucketItem(name: string): NavigationMenuItem {
+  const base = `${paths.buckets}/${encodeURIComponent(name)}`
+  return { label: name, to: base, active: isActive(base) }
+}
 
-  const system = all.filter(name => name.startsWith('mc_'))
-  const ordinary = all.filter(name => !name.startsWith('mc_'))
-  const buckets = ordinary.filter(name => name.endsWith('.files')).map(name => name.slice(0, -'.files'.length))
-  const collections = ordinary.filter(name => !name.endsWith('.files') && !name.endsWith('.chunks'))
+// The ones opened before the current one: a dropped collection or bucket is left out rather than shown as a
+// dead link, and the open one is already highlighted in its own group
+const recentItems = computed(() => panel.value.recent
+  .filter(entry => entry.kind === 'bucket' ? buckets.value.includes(entry.name) : names.value.includes(entry.name))
+  .map(entry => entry.kind === 'bucket' ? bucketItem(entry.name) : collectionItem(entry.name))
+  .filter(item => !item.active))
+
+const groups = computed(() => {
+  const matching = (list: string[]) => list.filter(name => !needle.value || name.toLowerCase().includes(needle.value))
 
   return [
-    { key: 'collections', label: t('serverManagement.nav.collections'), icon: 'i-lucide-table-2', items: collections.map(collectionItem) },
-    {
-      key: 'buckets',
-      label: t('serverManagement.nav.buckets'),
-      icon: 'i-lucide-folder',
-      items: buckets.map((name): NavigationMenuItem => {
-        const base = `${BUCKET_BASE}/${encodeURIComponent(name)}`
-        return { label: name, to: base, active: isActive(base) }
-      }),
-    },
-    { key: 'system', label: t('serverManagement.collections.system'), icon: 'i-lucide-lock', items: system.map(collectionItem) },
+    // Recents repeat entries from the groups below, so they only help while nothing is filtered
+    { key: 'recent', label: t('serverManagement.collections.recent'), items: needle.value ? [] : recentItems.value },
+    { key: 'collections', label: t('serverManagement.nav.collections'), items: matching(collections.value).map(collectionItem) },
+    { key: 'buckets', label: t('serverManagement.nav.buckets'), items: matching(buckets.value).map(bucketItem) },
+    { key: 'system', label: t('serverManagement.collections.system'), items: matching(system.value).map(collectionItem) },
   ].filter(group => group.items.length > 0)
 })
 
-// MongoCamp's own collections stay folded away unless one of them is open or the filter found one
-const closed = ref<Record<string, boolean>>({ system: true })
+const matchCount = computed(() => groups.value.reduce((sum, group) => sum + group.items.length, 0))
 
-function isOpen(key: string, items: NavigationMenuItem[]): boolean {
-  if (search.value.trim()) return true
-  if (items.some(item => item.active)) return true
-  return !closed.value[key]
+// While filtering every match is shown, so the group headers are plain labels, not toggles
+function isOpen(key: string): boolean {
+  return Boolean(needle.value) || !panel.value.closedGroups.includes(key)
 }
 
 function toggle(key: string) {
-  closed.value[key] = !closed.value[key]
+  const closed = panel.value.closedGroups
+  panel.value.closedGroups = closed.includes(key) ? closed.filter(item => item !== key) : [...closed, key]
+}
+
+// Opening a collection from elsewhere (table, palette, link) unfolds its group once. `unfoldedFor` remembers
+// which one, so a reload or a tab switch inside the same collection keeps a group the user folded again.
+const active = computed(() => {
+  for (const group of groups.value) {
+    if (group.key === 'recent') continue
+    const item = group.items.find(entry => entry.active)
+    if (item) return { group: group.key, name: String(item.label) }
+  }
+  return undefined
+})
+watch(active, (current) => {
+  if (!current || panel.value.unfoldedFor === current.name) return
+  panel.value.unfoldedFor = current.name
+  if (panel.value.closedGroups.includes(current.group)) toggle(current.group)
+}, { immediate: true })
+
+function links(): HTMLAnchorElement[] {
+  return [...(results.value?.querySelectorAll<HTMLAnchorElement>('a[href]') ?? [])]
+}
+
+function onFilterKeydown(event: KeyboardEvent) {
+  if (event.key === 'ArrowDown') {
+    event.preventDefault()
+    links()[0]?.focus()
+  }
+  else if (event.key === 'Enter' && needle.value) {
+    event.preventDefault()
+    links()[0]?.click()
+  }
+  else if (event.key === 'Escape' && search.value) {
+    event.preventDefault()
+    search.value = ''
+  }
+}
+
+// Arrow keys walk through all results across groups; up from the first goes back to the filter
+function onResultsKeydown(event: KeyboardEvent) {
+  if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return
+  const all = links()
+  const index = all.indexOf(document.activeElement as HTMLAnchorElement)
+  if (index === -1) return
+  event.preventDefault()
+  const next = index + (event.key === 'ArrowDown' ? 1 : -1)
+  if (next < 0) document.getElementById('collection-panel-filter')?.focus()
+  else all[Math.min(next, all.length - 1)]?.focus()
 }
 </script>
 
@@ -96,35 +126,62 @@ function toggle(key: string) {
   <div class="flex min-h-0 flex-1 flex-col">
     <div class="flex shrink-0 flex-col gap-2 border-b border-default p-3">
       <UButton
-        :to="COLLECTION_BASE"
+        :to="paths.collections"
         color="neutral"
         variant="ghost"
         icon="i-lucide-layout-list"
         class="justify-start"
-        :class="route.path === COLLECTION_BASE ? 'bg-elevated text-highlighted' : ''"
+        :class="route.path === paths.collections ? 'bg-elevated text-highlighted' : ''"
       >
         {{ t('serverManagement.collections.all') }}
       </UButton>
       <UInput
+        id="collection-panel-filter"
         v-model="search"
         icon="i-lucide-search"
         :placeholder="t('serverManagement.collections.filter')"
         :aria-label="t('serverManagement.collections.filter')"
         class="w-full"
-      />
+        :ui="{ trailing: 'pe-1' }"
+        @keydown="onFilterKeydown"
+      >
+        <template
+          v-if="search"
+          #trailing
+        >
+          <UButton
+            color="neutral"
+            variant="link"
+            size="sm"
+            icon="i-lucide-x"
+            :aria-label="t('serverManagement.collections.clearFilter')"
+            @click="search = ''"
+          />
+        </template>
+      </UInput>
+      <p
+        class="sr-only"
+        aria-live="polite"
+      >
+        {{ needle ? t('serverManagement.collections.matches', { n: matchCount }, matchCount) : '' }}
+      </p>
     </div>
 
-    <div class="min-h-0 flex-1 overflow-y-auto p-3">
+    <div
+      ref="results"
+      class="min-h-0 flex-1 overflow-y-auto p-3"
+      @keydown="onResultsKeydown"
+    >
       <UAlert
         v-if="failed"
         color="error"
         variant="subtle"
         :title="t('serverManagement.collections.failed')"
-        :actions="[{ label: t('serverManagement.collections.retry'), color: 'error', variant: 'outline', onClick: load }]"
+        :actions="[{ label: t('serverManagement.collections.retry'), color: 'error', variant: 'outline', onClick: refresh }]"
       />
 
       <div
-        v-else-if="loading && !names"
+        v-else-if="loading && names.length === 0"
         class="flex flex-col gap-2"
       >
         <USkeleton
@@ -138,7 +195,7 @@ function toggle(key: string) {
         v-else-if="groups.length === 0"
         class="px-2 text-sm text-muted"
       >
-        {{ t('serverManagement.collections.none') }}
+        {{ needle ? t('serverManagement.collections.none') : t('serverManagement.collections.empty') }}
       </p>
 
       <section
@@ -147,26 +204,40 @@ function toggle(key: string) {
         :key="group.key"
         class="mb-3"
       >
-        <button
-          type="button"
-          class="flex w-full items-center gap-1.5 rounded-sm px-2 py-1 text-xs font-medium text-muted hover:text-default"
-          :aria-expanded="isOpen(group.key, group.items)"
-          @click="toggle(group.key)"
+        <div
+          v-if="needle"
+          class="flex items-center gap-1.5 px-2 py-1 text-xs font-medium text-muted"
         >
-          <UIcon
-            name="i-lucide-chevron-right"
-            class="size-3.5 transition-transform"
-            :class="isOpen(group.key, group.items) ? 'rotate-90' : ''"
-            aria-hidden="true"
-          />
-          <span class="flex-1 text-start">{{ group.label }}</span>
+          <span class="flex-1">{{ group.label }}</span>
           <span class="tabular text-dimmed">{{ group.items.length }}</span>
-        </button>
+        </div>
+        <div
+          v-else
+          class="text-xs font-medium"
+        >
+          <button
+            type="button"
+            class="flex w-full items-center gap-1.5 rounded-sm px-2 py-1 text-muted hover:text-default"
+            :aria-expanded="isOpen(group.key)"
+            :aria-controls="`collection-panel-${group.key}`"
+            @click="toggle(group.key)"
+          >
+            <UIcon
+              name="i-lucide-chevron-right"
+              class="size-3.5 transition-transform"
+              :class="isOpen(group.key) ? 'rotate-90' : ''"
+              aria-hidden="true"
+            />
+            <span class="flex-1 text-start">{{ group.label }}</span>
+            <span class="tabular text-dimmed">{{ group.items.length }}</span>
+          </button>
+        </div>
         <UNavigationMenu
-          v-if="isOpen(group.key, group.items)"
+          v-if="isOpen(group.key)"
+          :id="`collection-panel-${group.key}`"
           :items="group.items"
           orientation="vertical"
-          :ui="{ link: 'font-mono text-[0.8125rem] py-1', linkLabel: 'truncate' }"
+          :ui="{ link: 'font-mono text-sm py-1', linkLabel: 'truncate' }"
         />
       </section>
     </div>

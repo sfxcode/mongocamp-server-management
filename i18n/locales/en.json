@@ -12,7 +12,6 @@
       "account": "Account",
       "manager": "Manager",
       "managerArea": "Manager area",
-      "admin": "Admin",
       "users": "Users",
       "roles": "Roles",
       "permissions": "Permissions",
@@ -101,7 +100,12 @@
       "system": "MongoCamp",
       "none": "Nothing matches the filter.",
       "all": "All collections",
-      "open": "Show collections"
+      "open": "Show collections",
+      "recent": "Recent",
+      "empty": "No collections yet.",
+      "clearFilter": "Clear filter",
+      "matches": "No matches | One match | {n} matches",
+      "bucketText": "Files stored in this GridFS bucket, with their metadata"
     },
     "error": {
       "notFoundTitle": "This page does not exist",
@@ -110,6 +114,11 @@
       "otherText": "The page could not be shown. Going back home usually helps.",
       "home": "Back to home",
       "login": "Go to login"
+    },
+    "buckets": {
+      "text": "GridFS buckets on this server: files with their metadata",
+      "emptyTitle": "No buckets yet",
+      "emptyText": "A bucket appears here once files are uploaded to it."
     },
     "shortcuts": {
       "title": "Keyboard shortcuts",
