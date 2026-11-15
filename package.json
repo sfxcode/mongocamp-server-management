@@ -29,8 +29,8 @@
     "shots": "node scripts/shots.mjs"
   },
   "dependencies": {
-    "@nuxt/fonts": "^0.14.0",
-    "@sfxcode/nuxt-ui-mongocamp": "^1.5.5",
+    "@nuxt/fonts": "^1.2.0",
+    "@sfxcode/nuxt-ui-mongocamp": "^1.5.6",
     "nuxt": "^4.6.4"
   },
   "devDependencies": {
